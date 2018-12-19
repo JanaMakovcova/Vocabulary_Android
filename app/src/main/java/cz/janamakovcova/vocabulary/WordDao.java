@@ -26,7 +26,7 @@ public interface WordDao {
     @Query("SELECT * FROM word WHERE word_english = :word_english AND word_czech = :word_czech")
     Word getByTranslate(String word_english, String word_czech);
 
-    @Query("DELETE FROM word WHERE wid = :wid")
-    void deleteQuery(int wid);
+    @Query("SELECT * FROM word ORDER BY RANDOM() LIMIT 3")
+    List<Word> getRandom3();
 
 }

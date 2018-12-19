@@ -14,10 +14,20 @@ public class WordAdapter extends BaseAdapter {
 
     private Context context;
     private List<Word> data;
+    private VocabularyDatabase vocabulary;
 
-    public WordAdapter(Context context, List<Word> data) {
+    public WordAdapter(Context context, VocabularyDatabase vocabulary) {
         this.context = context;
-        this.data = data;
+        this.vocabulary = vocabulary;
+
+        data = vocabulary.wordDao().getAll();
+    }
+
+    @Override
+    public void notifyDataSetChanged() {
+        data = vocabulary.wordDao().getAll();
+
+        super.notifyDataSetChanged();
     }
 
     @Override

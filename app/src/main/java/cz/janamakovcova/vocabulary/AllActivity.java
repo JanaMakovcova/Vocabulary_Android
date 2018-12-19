@@ -16,7 +16,6 @@ public class AllActivity extends AppCompatActivity {
     public ListView list_all;
 
     private WordAdapter mainAdapter;
-    private List<Word> listWord;
     private VocabularyDatabase vocabulary;
 
 
@@ -27,9 +26,7 @@ public class AllActivity extends AppCompatActivity {
         ButterKnife.bind(this);
         vocabulary = Room.databaseBuilder(this, VocabularyDatabase.class, "db_vocabulary").allowMainThreadQueries().build();
 
-        listWord = vocabulary.wordDao().getAll();
-
-        mainAdapter = new WordAdapter(this, listWord);
+        mainAdapter = new WordAdapter(this, vocabulary);
 
         list_all.setAdapter(mainAdapter);
 

@@ -33,13 +33,13 @@ public class MainActivity extends AppCompatActivity {
     @BindView(R.id.list_main)
     public ListView list_main;
 
+    @BindView(R.id.btn_game)
+    public Button btn_game;
+
     private Word word;
 
     private VocabularyDatabase vocabulary;
     private WordAdapter mainAdapter;
-    private List<Word> listWord;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,12 +48,8 @@ public class MainActivity extends AppCompatActivity {
         ButterKnife.bind(this);
 
         vocabulary = Room.databaseBuilder(this, VocabularyDatabase.class, "db_vocabulary").allowMainThreadQueries().build();
-        listWord = vocabulary.wordDao().getAll();
-
-        mainAdapter = new WordAdapter(this, listWord);
-
+        mainAdapter = new WordAdapter(this, vocabulary);
         list_main.setAdapter(mainAdapter);
-
 
         btn_add.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -68,7 +64,6 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if (vocabulary.wordDao().getByTranslate(english, czech)==null) {
-                    listWord.add(word);
                     vocabulary.wordDao().insertAll(word);
                     ediText_english.setText("");
                     ediText_czech.setText("");
@@ -86,9 +81,7 @@ public class MainActivity extends AppCompatActivity {
             public boolean onItemLongClick(AdapterView<?> parent, View view, int position, long id) {
 
 
-                //vocabulary.wordDao().delete(listWord.get(position));
-                vocabulary.wordDao().deleteQuery(listWord.get(position).getWid());
-                listWord.remove(position);
+                vocabulary.wordDao().delete(vocabulary.wordDao().getByWid((int)id));
                 mainAdapter.notifyDataSetChanged();
                 return true;
             }
@@ -98,9 +91,8 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(MainActivity.this, DetailActivity.class);
-
-                intent.putExtra("english", listWord.get(position).getWord_english());
-                intent.putExtra("czech", listWord.get(position).getWord_czech());
+                intent.putExtra("english", vocabulary.wordDao().getByWid((int) id).getWord_english());
+                intent.putExtra("czech", vocabulary.wordDao().getByWid((int)id).getWord_czech());
                 startActivity(intent);
 
             }
@@ -111,7 +103,17 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(MainActivity.this, AllActivity.class);
                 startActivity(intent);
-
+            }
+        });
+        btn_game.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(vocabulary.wordDao().getAll().size() > 3) {
+                    Intent intent = new Intent(MainActivity.this, GameActivity.class);
+                    startActivity(intent);
+                } else {
+                    Toast.makeText(MainActivity.this, "Málo slovíček pro hru", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
